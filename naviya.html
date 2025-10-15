@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Jump Over Cube Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes jump {
+      0% { bottom: 0; }
+      50% { bottom: 80px; }
+      100% { bottom: 0; }
+    }
+
+    .jump {
+      animation: jump 0.5s;
+    }
+  </style>
+</head>
+<body class="text-center mt-12 font-sans">
+  <h2 class="text-xl mb-6"></h2>
+
+  <div class="game w-[500px] h-[200px] border-2 border-black bg-purple-100 mx-auto relative overflow-hidden">
+    <div id="player" class="w-[40px] h-[40px] bg-yellow-500 absolute bottom-0 left-[50px] rounded-sm"></div>
+    <div id="cube" class="w-[40px] h-[40px] bg-pink-500 absolute bottom-0 left-[400px]"></div>
+  </div>
+
+  <p id="status" class="mt-2 text-red-600 text-lg"></p>
+
+  <script>
+    const player = document.getElementById("player");
+    const cube = document.getElementById("cube");
+    const status = document.getElementById("status");
+
+    let jumping = false;
+    let gameOver = false;
+    let cubeLeft = 400;
+
+    // Jump function
+    document.addEventListener("keydown", function(event){
+      if(event.code === "Space" && !jumping){
+        jumping = true;
+        player.classList.add("jump");
+        setTimeout(() => {
+          player.classList.remove("jump");
+          jumping = false;
+        }, 500);
+      }
+    });
+
+    // Move cube
+    function moveCube(){
+      if(gameOver) return;
+      cubeLeft -= 5;
+      cube.style.left = cubeLeft + "px";
+
+      // Reset cube when it moves off screen
+      if(cubeLeft < -40){
+        cubeLeft = 400;
+      }
+
+      // Collision detection
+      let playerBottom = parseInt(window.getComputedStyle(player).getPropertyValue("bottom"));
+      if(cubeLeft < 90 && cubeLeft > 50 && playerBottom <= 40){
+        gameOver = true;
+        status.innerText = "💀 Game Over! Press R to Restart";
+      }
+
+      requestAnimationFrame(moveCube); // repeat continuously
+    }
+
+    moveCube(); // start moving cube
+
+    // Restart game
+    document.addEventListener("keydown", function(event){
+      if(event.code === "KeyR" && gameOver){
+        gameOver = false;
+        cubeLeft = 400;
+        status.innerText = "";
+        moveCube(); // restart cube movement
+      }
+    });
+  </script>
+</body>
+</html>
